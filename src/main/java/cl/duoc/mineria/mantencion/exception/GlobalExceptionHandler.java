@@ -89,4 +89,18 @@ public class GlobalExceptionHandler {
         problem. setProperty("mensajeCorto", ex.getMessage());
         return problem;
     }
+
+    @ExceptionHandler(ServicioExternoNoDisponibleException.class)
+    public ProblemDetail handleServicioExternoNoDisponible(ServicioExternoNoDisponibleException ex) {
+        System.out.println("[Mantención] Dependencia externa no disponible: " + ex.getMessage());
+
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(
+            HttpStatus.SERVICE_UNAVAILABLE,
+            ex.getMessage()
+        );
+
+        problem.setTitle("Dependencia externa no disponible");
+        problem.setProperty("timestamp", Instant.now());
+        return problem;
+    }
 }

@@ -1,7 +1,9 @@
 package cl.duoc.mineria.mantencion.service;
 
+import cl.duoc.mineria.mantencion.exception.ServicioExternoNoDisponibleException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 @Service
 public class ExternalUsuarioService {
@@ -16,9 +18,11 @@ public class ExternalUsuarioService {
                     .bodyToMono(Boolean.class)
                     .block();
             return existe != null && existe;
+        } catch (WebClientResponseException.NotFound e) {
+            return false;
         } catch (Exception e) {
-            System.out.println("[Mantención] Error al conectar con Usuarios (8081). Fallback de desarrollo activo.");
-            return true;
+            throw new ServicioExternoNoDisponibleException(
+                "No se pudo validar el usuario " + usuarioId + ": " + e.getMessage());
         }
     }
 }

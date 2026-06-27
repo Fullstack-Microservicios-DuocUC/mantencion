@@ -1,8 +1,10 @@
 package cl.duoc.mineria.mantencion.service;
 
+import cl.duoc.mineria.mantencion.exception.ServicioExternoNoDisponibleException;
 import cl.duoc.mineria.mantencion.model.TipoEquipo;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 @Service
 public class ExternalEquipoService {
@@ -23,17 +25,22 @@ public class ExternalEquipoService {
                 return existe != null && existe;
 
             } else if (tipo == TipoEquipo.PALA) {
-                // Consulta directa al puerto de Palas (8085)
+                // Consulta directa al puerto de Palas (8083)
                 Boolean existe = webClient.get()
-                        .uri("http://localhost:8085/api/v1/palas/existe/" + equipoId)
+                        .uri("http://localhost:8083/api/v1/palas/existe/" + equipoId)
                         .retrieve()
                         .bodyToMono(Boolean.class)
                         .block();
                 return existe != null && existe;
             }
+        } catch (WebClientResponseException.NotFound e) {
+            // El otro servicio respondió: "este equipo no existe". Esa respuesta sí es confiable.
+            return false;
         } catch (Exception e) {
-            System.out.println("[Mantención] Error de conexión con el microservicio de " + tipo + ". Fallback activo.");
-            return true; // Fallback temporal para desarrollo local si el módulo está apagado
+            // Cualquier otro problema (timeout, conexión rechazada, error 500, etc):
+            // no sabemos si el equipo existe o no, así que NO asumimos que sí. Se detiene la operación.
+            throw new ServicioExternoNoDisponibleException(
+                "No se pudo validar el equipo " + tipo + " con ID " + equipoId + ": " + e.getMessage());
         }
         return false;
     }

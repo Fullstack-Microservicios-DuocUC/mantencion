@@ -15,8 +15,8 @@ public class MantencionMapper {
         OrdenMantencion orden = new OrdenMantencion();
         orden.setTurnoId(dto.getTurnoId());
         orden.setTipoEquipo(dto.getTipoEquipo());
-        orden.setEquipoId(dto.getEquipoId() != null ? dto.getEquipoId() : 0L);
-        orden.setReportadoPorUsuarioId(dto.getReportadoPorUsuarioId() != null ? dto.getReportadoPorUsuarioId() : 0L);
+        orden.setEquipoId(dto.getEquipoId());
+        orden.setReportadoPorUsuarioId(dto.getReportadoPorUsuarioId());
         orden.setDescripcionFalla(dto.getDescripcionFalla());
         orden.setPrioridad(dto.getPrioridad());
         orden.setEstadoOrden(EstadoOrden.PENDIENTE);
