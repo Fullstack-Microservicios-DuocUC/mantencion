@@ -8,12 +8,16 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 @Service
 public class ExternalUsuarioService {
 
-    private final WebClient webClient = WebClient.create();
+    private final WebClient webClient;
+
+    public ExternalUsuarioService(WebClient webClient) {
+        this.webClient = webClient;
+    }
 
     public boolean verificarUsuarioExiste(Long usuarioId) {
         try {
             Boolean existe = webClient.get()
-                    .uri("http://localhost:8081/api/v1/usuarios/existe/" + usuarioId)
+                    .uri("http://usuarios/api/v1/usuarios/existe/" + usuarioId)
                     .retrieve()
                     .bodyToMono(Boolean.class)
                     .block();

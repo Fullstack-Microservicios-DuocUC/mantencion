@@ -9,8 +9,11 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 @Service
 public class ExternalEquipoService {
 
-    private final WebClient webClient = WebClient.create();
+    private final WebClient webClient;
 
+    public ExternalEquipoService(WebClient webClient) {
+        this.webClient = webClient;
+    }
     public boolean verificarEquipoExiste(TipoEquipo tipo, Long equipoId) {
         if (tipo == null || equipoId == null) return false;
 
@@ -18,7 +21,7 @@ public class ExternalEquipoService {
             if (tipo == TipoEquipo.CAMION) {
                 // Consulta directa al puerto de Camiones (8084)
                 Boolean existe = webClient.get()
-                        .uri("http://localhost:8084/api/v1/camiones/existe/" + equipoId)
+                        .uri("http://camiones/api/v1/camiones/existe/" + equipoId)
                         .retrieve()
                         .bodyToMono(Boolean.class)
                         .block();
@@ -27,7 +30,7 @@ public class ExternalEquipoService {
             } else if (tipo == TipoEquipo.PALA) {
                 // Consulta directa al puerto de Palas (8083)
                 Boolean existe = webClient.get()
-                        .uri("http://localhost:8083/api/v1/palas/existe/" + equipoId)
+                        .uri("http://palas/api/v1/palas/existe/" + equipoId)
                         .retrieve()
                         .bodyToMono(Boolean.class)
                         .block();
